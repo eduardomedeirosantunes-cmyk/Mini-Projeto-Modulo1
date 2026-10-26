@@ -34,3 +34,38 @@ CANAIS_VALIDOS = {"mercado": "Mercado", "loja física": "Loja física", "web": "
 def padronizar_canal(texto):
     return CANAIS_VALIDOS.get(texto.strip().lower())
 
+# Função para validar a quantidade de produtos vendidos, garantindo que seja um número inteiro positivo.
+def validar_quantidade(texto):
+    try:
+        return int(texto) > 0
+    except ValueError:
+        return False
+
+
+def validar_preco(texto):
+    if texto.strip() == "":
+        return False
+
+    try:
+        return float(texto) >= 0
+
+    except ValueError:
+        return False
+
+
+# Formato de data utilizado para validação.
+FORMATO_DATA = "%Y-%m-%d %H:%M:%S"
+
+def converter_data(texto):
+    try:
+        return datetime.strptime(texto, FORMATO_DATA)
+
+    except (ValueError, TypeError):
+        return None
+
+
+# Transformando data no padrao Brasileiro
+
+def formatar_data_br(data):
+    return data.strftime("%d/%m/%Y")
+
