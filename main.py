@@ -1,6 +1,7 @@
 from pathlib import Path
 from funcoes import carregar_dados, df_para_registros, limpar_categoria, padronizar_canal,validar_quantidade
-from funcoes import validar_preco, converter_data, formatar_data_br
+from funcoes import validar_preco, converter_data, formatar_data_br, investigar_entrega, contar_pedidos_por_canal
+from funcoes import contar_pedidos_por_periodo
 
 
 # Descobrir onde está o main.py
@@ -218,3 +219,67 @@ for registro in registros:
         print("Data BR:", registro["data_br"])
         break
 
+#Investigando os registros que não possuem data de entrega
+
+print("\n=== INVESTIGAÇÃO DA ENTREGA ===")
+
+entrega = investigar_entrega(registros)
+
+print("Cancelados sem entrega:", entrega["sem_entrega_cancelado"])
+
+print("Outros status sem entrega:", entrega["sem_entrega_outros"])
+
+print("Hipótese verdadeira:", entrega["hipotese_verdadeira"])
+
+print("Primeiro exemplo:", entrega["exemplos"][0])
+
+
+#Relatorio de pedidos por canal
+
+print("\n=== RELATÓRIO DE PEDIDOS POR CANAL ===")
+
+contagem_canais, canais_desconhecidos = contar_pedidos_por_canal(registros)
+
+for canal, quantidade in contagem_canais.items():
+    print(canal, ":", quantidade)
+
+print("Canais desconhecidos:", canais_desconhecidos)
+
+#Verificando relatorio de pedidos por ano e mês
+
+print("\n=== RELATÓRIO DE PEDIDOS POR ANO E MÊS ===")
+
+contagem_periodos, datas_excluidas = contar_pedidos_por_periodo(registros)
+
+for periodo in sorted(contagem_periodos):
+    print(periodo, ":", contagem_periodos[periodo])
+
+print("Datas excluídas:", datas_excluidas)
+
+
+#calculando o percentual de pedidos por canal
+
+print("\n=== PERCENTUAL DE PEDIDOS POR CANAL ===")
+
+total_pedidos = len(registros)
+
+for canal, quantidade in contagem_canais.items():
+    percentual = (quantidade / total_pedidos) * 100
+
+    print(canal, ":", round(percentual, 1), "%")
+
+#Comparando o mês de outubro de 2024 e 2025
+
+print("\n=== COMPARAÇÃO DE OUTUBRO ===")
+
+outubro_2024 = contagem_periodos["2024-10"]
+outubro_2025 = contagem_periodos["2025-10"]
+
+diferenca = outubro_2025 - outubro_2024
+
+variacao = (diferenca / outubro_2024) * 100
+
+print("Outubro de 2024:", outubro_2024)
+print("Outubro de 2025:", outubro_2025)
+print("Diferença:", diferenca)
+print("Variação percentual:", round(variacao, 1), "%")
